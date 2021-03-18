@@ -1,0 +1,38 @@
+[package]
+name = "scraper"
+version = "0.12.0"
+edition = "2018"
+
+description = "HTML parsing and querying with CSS selectors"
+keywords = ["html", "css", "selector", "scraping"]
+
+authors = [
+    "Curtis McEnroe <june@causal.agency>",
+    "Vivek Kushwaha <yoursvivek@gmail.com>",
+]
+license = "ISC"
+
+repository = "https://github.com/programble/scraper"
+readme = "README.md"
+
+[dependencies]
+cssparser = "0.27"
+ego-tree = "0.6"
+html5ever = "0.25.1"
+matches = "0.1.6"
+selectors = "0.22"
+smallvec = "1"
+tendril = "0.4"
+
+[dependencies.getopts]
+version = "0.2.18"
+optional = true
+
+[features]
+default = ["main"]
+main = ["getopts"]
+
+[[bin]]
+name = "scraper"
+path = "src/main.rs"
+required-features = ["main"]

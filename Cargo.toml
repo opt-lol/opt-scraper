@@ -19,3 +19,8 @@ backoff = { version = "0.3.0", features = ["tokio"] }
 [profile.release]
 lto = true
 
+[patch.crates-io]
+# As of version 0.12.0, scraper's attr serialization is not deterministic.
+# This is a patched version that sorts the attrs before serialization
+# (see element_ref/serializable.rs:32)
+scraper = { path = "thirdparty/scraper" }
