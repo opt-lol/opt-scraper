@@ -1,3 +1,5 @@
+use backoff::future::retry;
+use backoff::ExponentialBackoff;
 use futures::stream::FuturesUnordered;
 use futures::stream::StreamExt;
 use lazy_static::lazy_static;
@@ -46,20 +48,26 @@ impl Record {
         let mut app_receipt_num = String::from(service_center);
         app_receipt_num.push_str(&id.to_string());
 
-        let res = client
-            .post(URL)
-            .query(&[
-                ("changeLocale", ""),
-                ("completedActionsCurrentPage", "0"),
-                ("upcomingActionsCurrentPage", "0"),
-                ("appReceiptNum", &app_receipt_num),
-                ("caseStatusSearchBtn", "CHECK+STATUS"),
-            ])
-            .send()
-            .await
-            .unwrap();
+        let text: String = retry(ExponentialBackoff::default(), || async {
+            let text = client
+                .post(URL)
+                .query(&[
+                    ("changeLocale", ""),
+                    ("completedActionsCurrentPage", "0"),
+                    ("upcomingActionsCurrentPage", "0"),
+                    ("appReceiptNum", &app_receipt_num),
+                    ("caseStatusSearchBtn", "CHECK+STATUS"),
+                ])
+                .send()
+                .await?
+                .text()
+                .await?;
+            Ok(text)
+        })
+        .await
+        .unwrap();
 
-        let html = Html::parse_document(&res.text().await.unwrap());
+        let html = Html::parse_document(&text);
 
         match html.select(&ERROR_MESSAGE_SELECTOR).next() {
             Some(error_element) => {
