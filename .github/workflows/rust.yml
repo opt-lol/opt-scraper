@@ -13,14 +13,7 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-            - name: Build
-              run: cargo build --release --verbose
+            - name: Debug build
+              run: cargo build
             - name: Run tests
-              run: cargo test --release --verbose
-            - name: Release
-              uses: softprops/action-gh-release@v1
-              if: startsWith(github.ref, 'refs/tags/')
-              with:
-                  files: "target/release/opt-scraper"
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: cargo test
